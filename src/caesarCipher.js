@@ -13,6 +13,9 @@ const caesarCipher = (input, shift = 1, flag) => {
   const upperAdditive = flag ? upperCharCodeStart : upperCharCodeEnd;
   const lowerAdditive = flag ? lowerCharCodeStart : lastLowerCharCode;
 
+  // E(x) = (x + shift) % lettersLength
+  // D(x) = (x - shift) % lettersLength
+
   return input
     .split('')
     .map((character) => {
