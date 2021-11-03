@@ -3,16 +3,16 @@ const { isLowerCaseLetter, isUpperCaseLetter } = require('./utils');
 const atbashCipher = (input) => {
   const upperAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const lowerAlphabet = 'abcdefghijklmnopqrstuvwxyz';
-  const upperAlphabetReverse = 'ZYXWVUTSRQPONMLKJIHGFEDCBA';
-  const lowerAlphabetReverse = 'zyxwvutsrqponmlkjihgfedcba';
+  const upperAlphabetReversed = 'ZYXWVUTSRQPONMLKJIHGFEDCBA';
+  const lowerAlphabetReversed = 'zyxwvutsrqponmlkjihgfedcba';
 
   return input
     .split('')
     .map((character) => {
       if (isUpperCaseLetter(character))
-        return upperAlphabetReverse[upperAlphabet.indexOf(character)];
+        return upperAlphabetReversed[upperAlphabet.indexOf(character)];
       else if (isLowerCaseLetter(character))
-        return lowerAlphabetReverse[lowerAlphabet.indexOf(character)];
+        return lowerAlphabetReversed[lowerAlphabet.indexOf(character)];
 
       return character;
     })
