@@ -19,6 +19,4 @@ const atbashCipher = (input) => {
     .join('');
 };
 
-console.log(atbashCipher('Svool Dliow!'));
-
 module.exports = atbashCipher;

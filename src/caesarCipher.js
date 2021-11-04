@@ -30,6 +30,5 @@ const caesarCipher = (input, shift = 1, flag) => {
     })
     .join('');
 };
-console.log(caesarCipher('abcdefghijklmnopqrstuvwxyz', 8, 1));
 
 module.exports = caesarCipher;

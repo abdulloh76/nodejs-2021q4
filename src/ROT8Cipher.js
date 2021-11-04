@@ -25,6 +25,4 @@ const ROT8Cipher = (input, flag) => {
     .join('');
 };
 
-console.log(ROT8Cipher('stuvwxyzabcdefghijklmnopqr', 0));
-
 module.exports = ROT8Cipher;
