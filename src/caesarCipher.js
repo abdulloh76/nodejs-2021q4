@@ -4,14 +4,12 @@ const {
   isLowerCaseLetter,
   isUpperCaseLetter,
   lettersLength,
-  upperCharCodeEnd,
+  lastUpperCharCode,
   lastLowerCharCode,
 } = require('./utils');
 
 const caesarCipher = (input, shift = 1, flag) => {
-  const chooser = flag ? 1 : -1; // like decryption(0) or encryption(1)
-  const upperAdditive = flag ? upperCharCodeStart : upperCharCodeEnd;
-  const lowerAdditive = flag ? lowerCharCodeStart : lastLowerCharCode;
+  const chooser = flag ? -1 : 1; // like decryption(0) or encryption(1)
 
   // E(x) = (x + shift) % lettersLength
   // D(x) = (x - shift) % lettersLength
@@ -19,19 +17,19 @@ const caesarCipher = (input, shift = 1, flag) => {
   return input
     .split('')
     .map((character) => {
-      if (isUpperCaseLetter(character))
-        return String.fromCharCode(
-          ((character.charCodeAt() - upperCharCodeStart + shift * chooser) % lettersLength) +
-            upperAdditive
-        );
-      else if (isLowerCaseLetter(character))
-        return String.fromCharCode(
-          ((character.charCodeAt() - lowerCharCodeStart + shift * chooser) % lettersLength) +
-            lowerAdditive
-        );
+      if (isUpperCaseLetter(character)) {
+        const move =
+          (character.charCodeAt() - upperCharCodeStart + shift * chooser) % lettersLength;
+        return String.fromCharCode(move > 0 ? move + upperCharCodeStart : move + lastUpperCharCode);
+      } else if (isLowerCaseLetter(character)) {
+        const move =
+          (character.charCodeAt() - lowerCharCodeStart + shift * chooser) % lettersLength;
+        return String.fromCharCode(move > 0 ? move + lowerCharCodeStart : move + lastLowerCharCode);
+      }
       return character;
     })
     .join('');
 };
+console.log(caesarCipher('abcdefghijklmnopqrstuvwxyz', 8, 1));
 
 module.exports = caesarCipher;
