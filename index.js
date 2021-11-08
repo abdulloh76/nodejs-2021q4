@@ -1,9 +1,10 @@
 const atbashCipher = require('./src/atbashCipher');
 const caesarCipher = require('./src/caesarCipher');
 const ROT8Cipher = require('./src/ROT8Cipher');
-const fs = require('fs/promises');
+const fsPromises = require('fs/promises');
+const fs = require('fs');
+const { Transform } = require('stream');
 const { stderr, exit, stdin, stdout } = require('process');
-const readline = require('readline');
 
 const grab = (fullFlag) => {
   const fullFlagIndex = process.argv.indexOf(fullFlag);
@@ -13,14 +14,17 @@ const grab = (fullFlag) => {
     (fullFlagIndex !== -1 && fullFlagIndex !== process.argv.lastIndexOf(fullFlag)) ||
     (shortFlagIndex !== -1 && shortFlagIndex !== process.argv.lastIndexOf(fullFlag.slice(1, 3))) ||
     (shortFlagIndex !== -1 && fullFlagIndex !== -1)
-  ) {
-    stderr.write(`${fullFlag.slice(2)} was duplicated`);
-    exit(1);
-  }
+  )
+    handleError(`${fullFlag.slice(2)} was duplicated`);
 
   if (fullFlagIndex !== -1) return process.argv[fullFlagIndex + 1];
   else if (shortFlagIndex !== -1) return process.argv[shortFlagIndex + 1];
   return false;
+};
+
+const handleError = (message) => {
+  stderr.write(message);
+  exit(1);
 };
 
 const config = grab('--config');
@@ -31,65 +35,59 @@ console.log(`config: ${config}`);
 console.log(`input: ${input}`);
 console.log(`output: ${output}`);
 
-if (!config) {
-  stderr.write('wrong config was given');
-  exit(1);
-}
+if (!config) handleError("config wasn't given");
 
-let inputText;
-
-if (input) {
-  fs.readFile(input)
-    .then((data) => {
-      inputText = data;
-      console.log('cool input file found');
-    })
-    .catch((e) => {
-      console.log(e.message);
-      exit(1);
-    });
-} else {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Ask me something : ', function (answer) {
-    inputText = answer;
-    process.exit();
-  });
-  // process.stdin.setEncoding('utf8');
-  // process.stdin.on('readable', () => {
-  //   const chunk = process.stdin.read();
-  //   if (chunk !== null) {
-  //     process.stdout.write(`data: ${chunk}`);
-  //   }
-  // });
-  // process.stdin.on('end', () => {
-  //   process.stdout.write('end');
-  // });
-
-  // stdin.on('data', (data) => {
-  //   inputText = data.toString();
-  //   exit(1);
-  // });
-}
-
+const cipheringQueue = [];
+debugger;
 config.split('-').map((unit) => {
   switch (unit[0]) {
     case 'C':
+      if (unit[1] !== '1' && unit[1] !== '0') handleError('wrong config was given');
+      cipheringQueue.push(caesarCipher(+unit[1]));
       break;
     case 'A':
+      if (unit[1]) handleError('wrong config was given');
+      cipheringQueue.push(atbashCipher);
       break;
     case 'R':
+      if (unit[1] !== '1' && unit[1] !== '0') handleError('wrong config was given');
+      cipheringQueue.push(ROT8Cipher(+unit[1]));
       break;
     default:
-      stderr.write('wrong config was given');
-      exit(1);
+      handleError('wrong config was given');
   }
 });
 
+if (input) {
+  const readStream = fs.createReadStream(input, 'utf-8');
+
+  readStream.on('error', (e) => handleError(e.message));
+
+  const transformStream = new Transform({
+    transform(chunk, encoding, callback) {
+      const ciphered = cipheringQueue.reduce((prev, cur) => cur(prev), chunk.toString());
+      this.push(ciphered);
+      callback();
+    },
+  });
+
+  readStream
+    .pipe(transformStream)
+    .on('error', (e) => handleError(e.message))
+    .pipe(stdout)
+    .on('error', (e) => handleError(e.message));
+} else {
+  let inputText;
+  stdin.on('data', function (data) {
+    inputText = data.toString();
+    if (!output) stdout.write(inputText);
+    exit(1);
+  });
+}
+
 if (output) {
-  fs.readFile(output)
+  fsPromises
+    .readFile(output)
     .then(() => {
       console.log('cool output file found');
     })
@@ -97,6 +95,4 @@ if (output) {
       console.log(e.message);
       exit(1);
     });
-} else {
-  stdout.write(inputText);
 }
