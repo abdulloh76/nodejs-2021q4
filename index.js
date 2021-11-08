@@ -31,14 +31,9 @@ const config = grab('--config');
 const input = grab('--input');
 const output = grab('--output');
 
-console.log(`config: ${config}`);
-console.log(`input: ${input}`);
-console.log(`output: ${output}`);
-
 if (!config) handleError("config wasn't given");
 
 const cipheringQueue = [];
-debugger;
 config.split('-').map((unit) => {
   switch (unit[0]) {
     case 'C':
@@ -58,41 +53,34 @@ config.split('-').map((unit) => {
   }
 });
 
+const transformStream = new Transform({
+  transform(chunk, encoding, callback) {
+    const ciphered = cipheringQueue.reduce((prev, cur) => cur(prev), chunk.toString());
+    this.push(ciphered);
+    callback();
+  },
+});
+let readStream;
+
 if (input) {
-  const readStream = fs.createReadStream(input, 'utf-8');
-
+  readStream = fs.createReadStream(input, 'utf-8');
   readStream.on('error', (e) => handleError(e.message));
-
-  const transformStream = new Transform({
-    transform(chunk, encoding, callback) {
-      const ciphered = cipheringQueue.reduce((prev, cur) => cur(prev), chunk.toString());
-      this.push(ciphered);
-      callback();
-    },
-  });
-
-  readStream
-    .pipe(transformStream)
-    .on('error', (e) => handleError(e.message))
-    .pipe(stdout)
-    .on('error', (e) => handleError(e.message));
 } else {
-  let inputText;
-  stdin.on('data', function (data) {
-    inputText = data.toString();
-    if (!output) stdout.write(inputText);
-    exit(1);
-  });
+  readStream = stdin;
+  readStream.on('end', () => exit(0));
 }
 
 if (output) {
-  fsPromises
-    .readFile(output)
-    .then(() => {
-      console.log('cool output file found');
-    })
-    .catch((e) => {
-      console.log(e.message);
-      exit(1);
-    });
+  readStream
+    .pipe(transformStream)
+    .on('error', (e) => handleError(e.message))
+    .pipe(fs.createWriteStream(output, 'utf-8'))
+    .on('error', (e) => handleError(e.message));
+} else {
+  readStream
+    .pipe(transformStream)
+    .on('end', () => exit(0))
+    .on('error', (e) => handleError(e.message))
+    .pipe(stdout)
+    .on('error', (e) => handleError(e.message));
 }
