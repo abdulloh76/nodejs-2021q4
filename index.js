@@ -1,7 +1,6 @@
 const atbashCipher = require('./src/atbashCipher');
 const caesarCipher = require('./src/caesarCipher');
 const ROT8Cipher = require('./src/ROT8Cipher');
-const fsPromises = require('fs/promises');
 const fs = require('fs');
 const { Transform } = require('stream');
 const { stderr, exit, stdin, stdout } = require('process');
@@ -60,27 +59,19 @@ const transformStream = new Transform({
     callback();
   },
 });
+
 let readStream;
 
 if (input) {
   readStream = fs.createReadStream(input, 'utf-8');
-  readStream.on('error', (e) => handleError(e.message));
 } else {
   readStream = stdin;
-  readStream.on('end', () => exit(0));
 }
 
+readStream.on('error', (e) => handleError(e.message));
+
 if (output) {
-  readStream
-    .pipe(transformStream)
-    .on('error', (e) => handleError(e.message))
-    .pipe(fs.createWriteStream(output, 'utf-8'))
-    .on('error', (e) => handleError(e.message));
+  readStream.pipe(transformStream).pipe(fs.createWriteStream(output, 'utf-8'));
 } else {
-  readStream
-    .pipe(transformStream)
-    .on('end', () => exit(0))
-    .on('error', (e) => handleError(e.message))
-    .pipe(stdout)
-    .on('error', (e) => handleError(e.message));
+  readStream.pipe(transformStream).pipe(stdout);
 }
