@@ -1,30 +1,10 @@
+const fs = require('fs');
+const { Transform } = require('stream');
+const { stdin, stdout } = require('process');
 const atbashCipher = require('./src/atbashCipher');
 const caesarCipher = require('./src/caesarCipher');
 const ROT8Cipher = require('./src/ROT8Cipher');
-const fs = require('fs');
-const { Transform } = require('stream');
-const { stderr, exit, stdin, stdout } = require('process');
-
-const grab = (fullFlag) => {
-  const fullFlagIndex = process.argv.indexOf(fullFlag);
-  const shortFlagIndex = process.argv.indexOf(fullFlag.slice(1, 3));
-
-  if (
-    (fullFlagIndex !== -1 && fullFlagIndex !== process.argv.lastIndexOf(fullFlag)) ||
-    (shortFlagIndex !== -1 && shortFlagIndex !== process.argv.lastIndexOf(fullFlag.slice(1, 3))) ||
-    (shortFlagIndex !== -1 && fullFlagIndex !== -1)
-  )
-    handleError(`${fullFlag.slice(2)} was duplicated`);
-
-  if (fullFlagIndex !== -1) return process.argv[fullFlagIndex + 1];
-  else if (shortFlagIndex !== -1) return process.argv[shortFlagIndex + 1];
-  return false;
-};
-
-const handleError = (message) => {
-  stderr.write(message);
-  exit(1);
-};
+const { grab, handleError } = require('./src/utils');
 
 const config = grab('--config');
 const input = grab('--input');
