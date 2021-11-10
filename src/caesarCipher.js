@@ -9,7 +9,7 @@ const {
 } = require('./utils');
 
 const caesarCipher = (flag, shift = 1) => {
-  const chooser = flag ? -1 : 1; // like decryption(0) or encryption(1)
+  const chooser = flag ? 1 : -1; // like decryption(0) or encryption(1)
 
   // E(x) = (x + shift) % lettersLength
   // D(x) = (x - shift) % lettersLength

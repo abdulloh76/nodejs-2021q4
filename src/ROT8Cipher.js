@@ -14,12 +14,12 @@ const ROT8Cipher = (flag) => {
       .map((character) => {
         if (isUpperCaseLetter(character))
           return flag
-            ? upperAlphabet[upperAlphabetPropelled.indexOf(character)]
-            : upperAlphabetPropelled[upperAlphabet.indexOf(character)];
+            ? upperAlphabetPropelled[upperAlphabet.indexOf(character)]
+            : upperAlphabet[upperAlphabetPropelled.indexOf(character)];
         else if (isLowerCaseLetter(character))
           return flag
-            ? lowerAlphabet[lowerAlphabetPropelled.indexOf(character)]
-            : lowerAlphabetPropelled[lowerAlphabet.indexOf(character)];
+            ? lowerAlphabetPropelled[lowerAlphabet.indexOf(character)]
+            : lowerAlphabet[lowerAlphabetPropelled.indexOf(character)];
 
         return character;
       })
