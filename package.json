@@ -1,0 +1,8 @@
+{
+  "name": "nodejs-2021q4",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/abdulloh76/nodejs-2021q4.git",
+  "author": "Abdulloh Musayev <abdulloh_musayev@epam.com>",
+  "license": "MIT"
+}
