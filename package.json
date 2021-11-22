@@ -1,0 +1,28 @@
+{
+  "name": "nodejs-2021q4",
+  "version": "1.0.0",
+  "description": "ciphering cli tool with nodejs",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "module": "commonjs",
+  "scripts": {
+    "test": "jest",
+    "test-coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdulloh76/nodejs-2021q4.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abdulloh76/nodejs-2021q4/issues"
+  },
+  "homepage": "https://github.com/abdulloh76/nodejs-2021q4#readme",
+  "devDependencies": {
+    "jest": "^27.3.1"
+  }
+}
